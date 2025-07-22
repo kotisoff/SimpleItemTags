@@ -5,7 +5,7 @@
 ```lua
 local api = require "simpleitemtags:init";
 
-local blocks = simpleitemtags.get_blocks_by_tags("lamps");
+local blocks = api.get_blocks_by_tags("lamps");
   
 for _, blockid in ipairs(blocks) do
   print(string.format("Привет, %s!", block.name(blockid))); -- Привет всем лампам!

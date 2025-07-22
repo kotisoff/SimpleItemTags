@@ -1,0 +1,4 @@
+{
+  "Lua.diagnostics.globals": ["PACK_ID"],
+  "Lua.diagnostics.disable": ["lowercase-global"]
+}

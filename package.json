@@ -1,0 +1,7 @@
+{
+  "id": "simpleitemtags",
+  "title": "SimpleItemTags API",
+  "version": "0.1.0",
+  "creator": "KotIsOff",
+  "description": "Простейший API для добавления и использования тегов."
+}

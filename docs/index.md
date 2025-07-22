@@ -39,3 +39,12 @@ function module.get_tags_by_blockid(blockid: integer): string[]
 -- Получает идентификаторы блоков, у которых есть все перечисленные теги.
 function module.get_blocks_have_tags(...: string): integer[]
 ```
+
+## Добавление своих тегов
+
+Для задуманного создайте блок и впишите туда следующее
+```json
+{
+  "simpleitemtags:tags@append": [ "Уже здесь указывайте новые теги" ]
+}
+```

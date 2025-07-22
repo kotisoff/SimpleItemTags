@@ -1,16 +1,21 @@
 local logger = require "logger";
 local module = {};
 
----@type { items: table<str, int[]>, blocks: table<str, int[]> }
+---@alias simpleitemtags.registry { items: table<str, int[]>, blocks: table<str, int[]> }
+
+---@type simpleitemtags.registry
 local registry = {
   items = {},
-  blocks = {}
+  blocks = {},
+  tags = {}
 };
 
 local tags_prop = "simpleitemtags:tags";
 
 
 events.on("simpleitemtags:first_tick", function()
+  local tags = {};
+
   logger.println("I", "Читаем теги блоков...")
   for blockid, value in ipairs(block.properties) do
     local itemid = block.get_picking_item(blockid);
@@ -18,6 +23,8 @@ events.on("simpleitemtags:first_tick", function()
     local prop = value[tags_prop]
     if prop and type(prop) == "table" then
       for _, tag in ipairs(prop) do
+        tags[tag] = true;
+
         registry.blocks[tag] = registry.blocks[tag] or {};
         registry.items[tag] = registry.items[tag] or {};
 
@@ -34,6 +41,8 @@ events.on("simpleitemtags:first_tick", function()
     local prop = value[tags_prop]
     if prop and type(prop) == "string" then
       for _, tag in ipairs(prop) do
+        tags[tag] = true;
+
         registry.items[tag] = registry.items[tag] or {};
 
         table.insert(registry.items[tag], itemid);
@@ -41,6 +50,10 @@ events.on("simpleitemtags:first_tick", function()
     elseif prop then
       logger.println("E", string.format("Ошибка чтения тегов предмета: %s", block.name(itemid)));
     end
+  end
+
+  for tag, _ in pairs(tags) do
+    table.insert(registry.tags, tag);
   end
 
   logger.println("I", "Все доступные теги прочитаны.")
@@ -95,18 +108,6 @@ local function get_elements_have_tags(list, ...)
   return elements;
 end
 
-local function combine_tables(t1, t2)
-  local t = table.copy(t1);
-
-  for _, value in ipairs(t2) do
-    if not table.has(t, value) then
-      table.insert(t, value);
-    end
-  end
-
-  return t;
-end
-
 ---@param ... str
 function module.get_blocks_by_tags(...)
   return get_elements_by_tags("blocks", ...);
@@ -127,15 +128,6 @@ function module.get_tags_by_itemid(itemid)
   return get_tags_by_elementid(item.properties, itemid);
 end
 
----@return str[]
-function module.get_all_tags()
-  local blocks = registry.blocks;
-  local items = registry.items;
-  local t = combine_tables(blocks, items);
-
-  return t;
-end
-
 ---@param ... str
 function module.get_blocks_have_tags(...)
   return get_elements_have_tags(block.properties, ...);
@@ -144,6 +136,16 @@ end
 ---@param ... str
 function module.get_items_have_tags(...)
   return get_elements_have_tags(item.properties, ...);
+end
+
+---@return str[]
+function module.get_all_tags()
+  return table.copy(registry.tags);
+end
+
+---@return simpleitemtags.registry
+function module.get_registry()
+  return table.deep_copy(registry);
 end
 
 return module;

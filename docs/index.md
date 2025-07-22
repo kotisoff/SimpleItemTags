@@ -14,11 +14,14 @@ end
 
 ## Методы
 
-### Общий
+### Общие
 
 ```lua
 -- Получает все теги.
 function api.get_all_tags(): string[]
+
+-- Получает копию регистра тегов.
+function api.get_registry(): { items: table<string, integer[]>, blocks: table<string, integer[]>, tags: string[] }
 ```
 
 ### Предметы

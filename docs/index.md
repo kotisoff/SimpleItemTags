@@ -14,6 +14,13 @@ end
 
 ## Методы
 
+### Общий
+
+```lua
+-- Получает все теги.
+function api.get_all_tags(): string[]
+```
+
 ### Предметы
 
 ```lua
@@ -43,6 +50,7 @@ function module.get_blocks_have_tags(...: string): integer[]
 ## Добавление своих тегов
 
 Для задуманного создайте блок и впишите туда следующее
+
 ```json
 {
   "simpleitemtags:tags@append": [ "Уже здесь указывайте новые теги" ]

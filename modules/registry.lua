@@ -90,6 +90,18 @@ local function get_elements_have_tags(list, ...)
   return elements;
 end
 
+local function combine_tables(t1, t2)
+  local t = table.copy(t1);
+
+  for _, value in ipairs(t2) do
+    if not table.has(t, value) then
+      table.insert(t, value);
+    end
+  end
+
+  return t;
+end
+
 ---@param ... str
 function module.get_blocks_by_tags(...)
   return get_elements_by_tags("blocks", ...);
@@ -108,6 +120,15 @@ end
 ---@param itemid int
 function module.get_tags_by_itemid(itemid)
   return get_tags_by_elementid(item.properties, itemid);
+end
+
+---@return str[]
+function module.get_all_tags()
+  local blocks = registry.blocks;
+  local items = registry.items;
+  local t = combine_tables(blocks, items);
+
+  return t;
 end
 
 ---@param ... str

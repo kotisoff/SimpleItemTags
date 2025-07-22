@@ -9,15 +9,20 @@ local registry = {
 
 local tags_prop = "simpleitemtags:tags";
 
+
 events.on("simpleitemtags:first_tick", function()
   logger.println("I", "Читаем теги блоков...")
   for blockid, value in ipairs(block.properties) do
+    local itemid = block.get_picking_item(blockid);
+
     local prop = value[tags_prop]
     if prop and type(prop) == "table" then
       for _, tag in ipairs(prop) do
         registry.blocks[tag] = registry.blocks[tag] or {};
+        registry.items[tag] = registry.items[tag] or {};
 
         table.insert(registry.blocks[tag], blockid);
+        table.insert(registry.items[tag], itemid);
       end
     elseif prop then
       logger.println("E", string.format("Ошибка чтения тегов блока: %s", block.name(blockid)));

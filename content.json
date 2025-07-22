@@ -1,6 +1,4 @@
 {
-  "entities": [],
-  "items": [],
   "blocks": [
     "base:bazalt",
     "base:blue_lamp",
@@ -28,5 +26,9 @@
     "base:water",
     "base:wood",
     "base:wooden_door"
-  ]
+  ],
+  "items": [
+    "base:bazalt_breaker"
+  ],
+  "entities": []
 }

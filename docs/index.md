@@ -28,7 +28,7 @@ function api.get_registry(): { items: table<string, integer[]>, blocks: table<st
 
 ```lua
 -- Получает идентификаторы предметов, у которых есть один из тегов.
-function api.get_items_by_tag(...: string): integer[]
+function api.get_items_by_tags(...: string): integer[]
 
 -- Получает теги по идентификатору предмета.
 function api.get_tags_by_itemid(itemid: integer): string[]

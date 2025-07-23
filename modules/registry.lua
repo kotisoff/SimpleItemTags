@@ -135,7 +135,7 @@ function module.get_blocks_by_tags(...)
 end
 
 ---@param ... str
-function module.get_items_by_tag(...)
+function module.get_items_by_tags(...)
   return get_elements_by_tags("items", ...);
 end
 

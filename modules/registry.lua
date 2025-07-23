@@ -47,7 +47,7 @@ events.on("simpleitemtags:first_tick", function()
   logger.println("I", "Reading item tags...")
   for itemid, value in ipairs(item.properties) do
     local prop = value[tags_prop]
-    if prop and type(prop) == "string" then
+    if prop and type(prop) == "table" then
       for _, tag in ipairs(prop) do
         registry.tags[tag] = true;
         use_or_create(elements.items, tag, {});
@@ -55,7 +55,7 @@ events.on("simpleitemtags:first_tick", function()
         table.insert(elements.items[tag], itemid);
       end
     elseif prop then
-      logger.println("E", string.format("Unable to read tags of item: %s", block.name(itemid)));
+      logger.println("E", string.format("Unable to read tags of item: %s", item.name(itemid)));
     end
   end
 
@@ -67,8 +67,10 @@ end)
 ---@return int[]
 local function get_elements_by_tags(list, ...)
   local elements = {};
-  for _, tag in ipairs({ ... }) do
-    local tmp = registry.elements[list][tag] or {}
+
+  local tags = { ... };
+  for _, tag in ipairs(tags) do
+    local tmp = registry.elements[list][tag] or {};
 
     for _, id in ipairs(tmp) do
       table.insert(elements, id);
@@ -163,7 +165,7 @@ end
 function module.get_all_tags()
   local keys = {};
   for tag, _ in pairs(registry.tags) do
-    table.insert(keys);
+    table.insert(keys, tag);
   end
 
   return keys;

@@ -1,62 +1,65 @@
 local logger = require "logger";
 local module = {};
 
----@alias simpleitemtags.registry { items: table<str, int[]>, blocks: table<str, int[]> }
+---@alias simpleitemtags.registry.elements { items: table<str, int[]>, blocks: table<str, int[]> }
 
----@type simpleitemtags.registry
 local registry = {
-  items = {},
-  blocks = {},
+  ---@type simpleitemtags.registry.elements
+  elements = {
+    blocks = {},
+    items = {},
+  },
+  ---@type table<str, true>
   tags = {}
 };
 
+---@param table table
+---@param key str
+---@param default any
+local function use_or_create(table, key, default)
+  table[key] = table[key] or default;
+end
+
 local tags_prop = "simpleitemtags:tags";
 
-
 events.on("simpleitemtags:first_tick", function()
-  local tags = {};
+  local elements = registry.elements;
 
-  logger.println("I", "Читаем теги блоков...")
+  logger.println("I", "Reading block tags...")
   for blockid, value in ipairs(block.properties) do
     local itemid = block.get_picking_item(blockid);
 
     local prop = value[tags_prop]
     if prop and type(prop) == "table" then
       for _, tag in ipairs(prop) do
-        tags[tag] = true;
+        registry.tags[tag] = true;
+        use_or_create(elements.blocks, tag, {});
+        use_or_create(elements.items, tag, {});
 
-        registry.blocks[tag] = registry.blocks[tag] or {};
-        registry.items[tag] = registry.items[tag] or {};
-
-        table.insert(registry.blocks[tag], blockid);
-        table.insert(registry.items[tag], itemid);
+        table.insert(elements.blocks[tag], blockid);
+        table.insert(elements.items[tag], itemid);
       end
     elseif prop then
-      logger.println("E", string.format("Ошибка чтения тегов блока: %s", block.name(blockid)));
+      logger.println("E", string.format("Unable to read tags of block: %s", block.name(blockid)));
     end
   end
 
-  logger.println("I", "Читаем теги предметов...")
+  logger.println("I", "Reading item tags...")
   for itemid, value in ipairs(item.properties) do
     local prop = value[tags_prop]
     if prop and type(prop) == "string" then
       for _, tag in ipairs(prop) do
-        tags[tag] = true;
+        registry.tags[tag] = true;
+        use_or_create(elements.items, tag, {});
 
-        registry.items[tag] = registry.items[tag] or {};
-
-        table.insert(registry.items[tag], itemid);
+        table.insert(elements.items[tag], itemid);
       end
     elseif prop then
-      logger.println("E", string.format("Ошибка чтения тегов предмета: %s", block.name(itemid)));
+      logger.println("E", string.format("Unable to read tags of item: %s", block.name(itemid)));
     end
   end
 
-  for tag, _ in pairs(tags) do
-    table.insert(registry.tags, tag);
-  end
-
-  logger.println("I", "Все доступные теги прочитаны.")
+  logger.println("I", "Done.")
 end)
 
 ---@param list "items" | "blocks"
@@ -65,7 +68,8 @@ end)
 local function get_elements_by_tags(list, ...)
   local elements = {};
   for _, tag in ipairs({ ... }) do
-    local tmp = (registry[list][tag] or {})
+    local tmp = registry.elements[list][tag] or {}
+
     for _, id in ipairs(tmp) do
       table.insert(elements, id);
     end
@@ -108,6 +112,23 @@ local function get_elements_have_tags(list, ...)
   return elements;
 end
 
+
+---@param list "items" | "blocks"
+---@param elid int
+---@param ... str
+local function add_tags_to_element(list, elid, ...)
+  local reg = registry.elements[list];
+
+  local tags = { ... };
+
+  for _, tag in ipairs(tags) do
+    registry.tags[tag] = true;
+    use_or_create(reg, tag, {});
+
+    table.insert(reg[tag], elid);
+  end
+end
+
 ---@param ... str
 function module.get_blocks_by_tags(...)
   return get_elements_by_tags("blocks", ...);
@@ -140,12 +161,26 @@ end
 
 ---@return str[]
 function module.get_all_tags()
-  return table.copy(registry.tags);
+  local keys = {};
+  for tag, _ in pairs(registry.tags) do
+    table.insert(keys);
+  end
+
+  return keys;
 end
 
----@return simpleitemtags.registry
+---@return simpleitemtags.registry.elements
 function module.get_registry()
-  return table.deep_copy(registry);
+  return table.deep_copy(registry.elements);
+end
+
+function module.add_tags_to_item(itemid, ...)
+  add_tags_to_element("items", itemid, ...);
+end
+
+function module.add_tags_to_block(blockid, ...)
+  add_tags_to_element("blocks", blockid, ...);
+  add_tags_to_element("items", block.get_picking_item(blockid), ...);
 end
 
 return module;

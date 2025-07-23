@@ -31,23 +31,29 @@ function api.get_registry(): { items: table<string, integer[]>, blocks: table<st
 function api.get_items_by_tag(...: string): integer[]
 
 -- Получает теги по идентификатору предмета.
-function module.get_tags_by_itemid(itemid: integer): string[]
+function api.get_tags_by_itemid(itemid: integer): string[]
 
 -- Получает идентификаторы предметов, у которых есть все перечисленные теги.
-function module.get_items_have_tags(...: string): integer[]
+function api.get_items_have_tags(...: string): integer[]
+
+-- Добавляет теги предмету по указанному идентификатору.
+function api.add_tags_to_item(itemid: integer, ...: string)
 ```
 
 ### Блоки
 
 ```lua
 -- Получает идентификаторы блоков, у которых есть один из тегов.
-function module.get_blocks_by_tags(...: string): integer[]
+function api.get_blocks_by_tags(...: string): integer[]
 
 -- Получает теги по идентификатору блока.
-function module.get_tags_by_blockid(blockid: integer): string[]
+function api.get_tags_by_blockid(blockid: integer): string[]
 
 -- Получает идентификаторы блоков, у которых есть все перечисленные теги.
-function module.get_blocks_have_tags(...: string): integer[]
+function api.get_blocks_have_tags(...: string): integer[]
+
+-- Добавляет теги блоку и его предмету по указанному идентификатору.
+function api.add_tags_to_block(blockid: integer, ...: string)
 ```
 
 ## Добавление своих тегов
